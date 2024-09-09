@@ -7,11 +7,12 @@ class Database
     private function __construct()
     {
         $servername = "localhost"; // Adjust as needed
-        $username = "your_username"; // Adjust as needed
-        $password = "your_password"; // Adjust as needed
+        $username = "sahan"; // Adjust as needed
+        $password = "Sahan@123"; // Adjust as needed
         $dbname = "event_management"; // Adjust as needed
+        $port = 3306; // Adjust as needed
 
-        $this->conn = new mysqli($servername, $username, $password, $dbname);
+        $this->conn = new mysqli($servername, $username, $password, $dbname, $port);
 
         if ($this->conn->connect_error) {
             die("Connection failed: " . $this->conn->connect_error);
@@ -45,7 +46,7 @@ class Database
         if ($conn->query($sql) === TRUE) {
             return $conn->insert_id;
         } else {
-            return false;
+            throw new Exception("Database Error: " . $conn->error);
         }
     }
 
@@ -59,7 +60,11 @@ class Database
         $setClause = rtrim($setClause, ", ");
         $sql = "UPDATE $table SET $setClause WHERE $where";
 
-        return $conn->query($sql);
+        if ($conn->query($sql) === TRUE) {
+            return true;
+        } else {
+            throw new Exception("Database Error: " . $conn->error);
+        }
     }
 
     public function delete($table, $where)
@@ -67,7 +72,11 @@ class Database
         $conn = $this->getConnection();
         $sql = "DELETE FROM $table WHERE $where";
 
-        return $conn->query($sql);
+        if ($conn->query($sql) === TRUE) {
+            return true;
+        } else {
+            throw new Exception("Database Error: " . $conn->error);
+        }
     }
 
     public function search($table, $columns, $where = "")
@@ -80,12 +89,18 @@ class Database
         }
 
         $result = $conn->query($sql);
-        $data = [];
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $data[] = $row;
-            }
+        if (!$result) {
+            throw new Exception("Database Error: " . $conn->error);
         }
-        return $data;
+
+        return $result;
+
+        // $data = [];
+        // if ($result->num_rows > 0) {
+        //     while ($row = $result->fetch_assoc()) {
+        //         $data[] = $row;
+        //     }
+        // }
+        // return $data;
     }
 }
