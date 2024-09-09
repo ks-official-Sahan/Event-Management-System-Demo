@@ -35,8 +35,10 @@ class AdminController
             $errors = [];
 
             // Input validation 
-            if (empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
-                empty($input['email']) || empty($input['password']) || empty($input['mobile'])) {
+            if (
+                empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
+                empty($input['email']) || empty($input['password']) || empty($input['mobile'])
+            ) {
                 $errors[] = 'All fields are required.';
             }
 
@@ -119,58 +121,84 @@ class AdminController
 
     public static function reviewEvents()
     {
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            self::sendJsonResponse('error', 'You are not authorized to view this page.');
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
-        try {
-            $pendingEvents = Event::getPendingEvents();
-        } catch (Exception $e) {
-            self::sendJsonResponse('error', 'Error fetching pending events: ' . $e->getMessage());
-        }
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $input = self::getJsonInput();
-            $eventId = self::sanitizeInput($input['event_id']);
-
+        if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
             try {
-                if (isset($input['approve_event'])) {
-                    if (Event::approveEvent($eventId)) {
-                        self::sendJsonResponse('success', 'Event approved!');
-                    } else {
-                        self::sendJsonResponse('error', 'Error approving event. Please try again.');
+                $pendingEvents = Event::getPendingEvents();
+            } catch (Exception $e) {
+                $message = "Error fetching pending events: " . $e->getMessage();
+                $pendingEvents = [];
+            }
+
+            if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                if (isset($_POST['approve_event'])) {
+                    $eventId = self::sanitizeInput($_POST['event_id']);
+                    try {
+                        if (Event::approveEvent($eventId)) {
+                            $message = "Event approved!";
+                        } else {
+                            $message = "Error approving event. Please try again.";
+                        }
+                    } catch (Exception $e) {
+                        $message = "Error approving event: " . $e->getMessage();
                     }
-                } elseif (isset($input['reject_event'])) {
-                    if (Event::rejectEvent($eventId)) {
-                        self::sendJsonResponse('success', 'Event rejected!');
-                    } else {
-                        self::sendJsonResponse('error', 'Error rejecting event. Please try again.');
+                } elseif (isset($_POST['reject_event'])) {
+                    $eventId = self::sanitizeInput($_POST['event_id']);
+                    try {
+                        if (Event::rejectEvent($eventId)) {
+                            $message = "Event rejected!";
+                        } else {
+                            $message = "Error rejecting event. Please try again.";
+                        }
+                    } catch (Exception $e) {
+                        $message = "Error rejecting event: " . $e->getMessage();
                     }
                 }
-            } catch (Exception $e) {
-                self::sendJsonResponse('error', 'Error processing event: ' . $e->getMessage());
+
+                // Re-fetch pending events after approval/rejection
+                try {
+                    $pendingEvents = Event::getPendingEvents();
+                } catch (Exception $e) {
+                    $message = "Error fetching pending events: " . $e->getMessage();
+                }
             }
+
+            $projectPath = $_SERVER['DOCUMENT_ROOT'];
+            include "$projectPath/eventSys/view/review_events.php";
         } else {
-            self::sendJsonResponse('success', 'Pending events fetched successfully.', ['events' => $pendingEvents]);
+            echo "You are not authorized to view this page.";
         }
     }
 
     public static function listUsers()
     {
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            self::sendJsonResponse('error', 'You are not authorized to view this page.');
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
         }
+        if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
+            try {
+                $users = User::getAll();
+            } catch (Exception $e) {
+                // Handle the error, set $users to an empty array
+                $users = [];
+                $message = "Error fetching users: " . $e->getMessage(); // You can display this error message in the view
+            }
 
-        try {
-            $users = User::getAll();
-            self::sendJsonResponse('success', 'Users fetched successfully.', ['users' => $users]);
-        } catch (Exception $e) {
-            self::sendJsonResponse('error', 'Error fetching users: ' . $e->getMessage());
+            $projectPath = $_SERVER['DOCUMENT_ROOT'];
+            include "$projectPath/eventSys/view/user_list.php";
+        } else {
+            echo "You are not authorized to view this page.";
         }
     }
 
     public static function viewUserProfile($userId)
     {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
             self::sendJsonResponse('error', 'You are not authorized to view this page.');
         }
@@ -178,7 +206,9 @@ class AdminController
         try {
             $userData = User::getById($userId);
             if ($userData) {
-                self::sendJsonResponse('success', 'User profile fetched successfully.', ['user' => $userData]);
+                $projectPath = $_SERVER['DOCUMENT_ROOT'];
+                include "$projectPath/eventSys/view/user_profile.php";
+                // self::sendJsonResponse('success', 'User profile fetched successfully.', ['user' => $userData]);
             } else {
                 self::sendJsonResponse('error', 'User not found.');
             }
@@ -193,8 +223,10 @@ class AdminController
             $input = self::getJsonInput();
 
             // Input validation
-            if (empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
-                empty($input['email']) || empty($input['mobile'])) {
+            if (
+                empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
+                empty($input['email']) || empty($input['mobile'])
+            ) {
                 self::sendJsonResponse('error', 'All fields are required.');
             } elseif (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
                 self::sendJsonResponse('error', 'Invalid email format.');
@@ -244,8 +276,10 @@ class AdminController
             $input = self::getJsonInput();
 
             // Input validation
-            if (empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
-                empty($input['email']) || empty($input['mobile'])) {
+            if (
+                empty($input['first_name']) || empty($input['last_name']) || empty($input['username']) ||
+                empty($input['email']) || empty($input['mobile'])
+            ) {
                 self::sendJsonResponse('error', 'All fields are required.');
             } elseif (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
                 self::sendJsonResponse('error', 'Invalid email format.');

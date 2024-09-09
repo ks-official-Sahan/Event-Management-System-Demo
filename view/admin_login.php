@@ -17,7 +17,7 @@ include 'layout.php';
         <form id="adminLoginForm" method="post" action="/admin/login">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="email" class="form-control" id="username" name="username" required>
+                <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>

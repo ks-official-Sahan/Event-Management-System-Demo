@@ -19,9 +19,13 @@ if ($requestUri == '/register' && $requestMethod == 'POST') {
     AdminController::login();
 } elseif ($requestUri == '/submit-event' && $requestMethod == 'POST') {
     EventController::submit();
-} elseif ($requestUri == '/admin/review-events' && $requestMethod == 'GET') {
+} elseif ($requestUri == '/admin/review-events') {
     AdminController::reviewEvents();
-} elseif ($requestUri == '/logout' && $requestMethod == 'GET') {
+} elseif ($requestUri == '/admin/events' && $requestMethod == 'GET') {
+    EventController::listAll();
+} elseif ($requestUri == '/view/my-events' && $requestMethod == 'GET') {
+    EventController::listByUser();
+} elseif ($requestUri == '/logout') {
     UserController::logout();
 } elseif ($requestUri == '/profile' && $requestMethod == 'GET') {
     UserController::viewProfile();
@@ -43,4 +47,5 @@ if ($requestUri == '/register' && $requestMethod == 'POST') {
     // Handling 404 errors
     http_response_code(404);
     echo json_encode(['status' => 'error', 'message' => '404 Not Found']);
+    header('Location: /eventsys/view/login.php');
 }

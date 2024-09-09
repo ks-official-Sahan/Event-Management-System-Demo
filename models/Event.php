@@ -1,4 +1,8 @@
 <?php
+$projectPath = $_SERVER['DOCUMENT_ROOT'];
+
+require_once "$projectPath/eventSys/Database.php";
+
 class Event
 {
     public static function create($eventType, $eventDate, $eventTime, $numGuests, $addons, $contactName, $contactEmail, $contactPhone, $specialRequests)
@@ -30,7 +34,15 @@ class Event
     public static function getPendingEvents()
     {
         try {
-            return Database::getInstance()->search('events', ['*'], "status = 'pending'");
+            $result = Database::getInstance()->search('events', ['*'], "status = 'pending'");
+            $data = [];
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $data[] = $row;
+                }
+            }
+            return $data;
+
         } catch (Exception $e) {
             // Handle the database error
             error_log("Error fetching pending events: " . $e->getMessage());
@@ -60,5 +72,38 @@ class Event
         }
     }
 
-    // ... other Event model methods ...
+    public static function getAllEvents()
+    {
+        try {
+            $result = Database::getInstance()->search('events', ['*']);
+            $data = [];
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $data[] = $row;
+                }
+            }
+            return $data;
+        } catch (Exception $e) {
+            // Handle the database error
+            error_log("Error fetching all events: " . $e->getMessage());
+            return []; // Return an empty array in case of error
+        }
+    }
+
+    public static function getEventsByUserId($userId)
+    {
+        try {
+            $result = Database::getInstance()->search('events', ['*'], "user_id = $userId");
+            $data = [];
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $data[] = $row;
+                }
+            }
+            return $data;
+        } catch (Exception $e) {
+            error_log("Error fetching events by user ID: " . $e->getMessage());
+            return [];
+        }
+    }
 }

@@ -17,7 +17,13 @@ class User
     public static function getById($userId)
     {
         $result = Database::getInstance()->search('users', ['*'], "id = $userId");
-        return ($result && count($result) > 0) ? $result[0] : null;
+        $data = [];
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return ($data && count($data) > 0) ? $data[0] : null;
     }
 
     public static function update($userId, $data)

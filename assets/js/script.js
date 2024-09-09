@@ -26,6 +26,7 @@ async function handleResponse(response) {
 
 function handleError(error) {
   console.error("Error:", error);
+  console.log(error.message);
   alert("An error occurred. Please try again.");
 }
 
@@ -142,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((data) => {
           alert(data.message);
           if (data.status === "success") {
-            window.location = `${UI_PATH}/admin/login.php`;
+            window.location = `${UI_PATH}/admin_login.php`;
           }
         })
         .catch(handleError);
@@ -177,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((data) => {
           alert(data.message);
           if (data.status === "success") {
-            window.location = `${UI_PATH}/admin/review-events.php`;
+            window.location = `${API_URL}/admin/review-events`;
           }
         })
         .catch(handleError);

@@ -19,13 +19,11 @@ CREATE TABLE IF NOT EXISTS users (
 -- Create the 'admins' table
 CREATE TABLE IF NOT EXISTS admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(50),
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     mobile_no VARCHAR(20),
-    position VARCHAR(100),
     username VARCHAR(50) NOT NULL UNIQUE
 );
 

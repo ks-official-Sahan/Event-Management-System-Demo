@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../../../assets/css/bootstrap.min.css">
 <?php
 // Include the base layout
 include 'layout.php';
@@ -7,12 +8,12 @@ include 'layout.php';
     <div class="col-md-6">
         <h2>User Profile</h2>
 
-        <?php if (isset($message)): ?>
+        <?php if (isset($message)) { ?>
             <div class="alert alert-<?php echo (strpos($message, 'successful') !== false) ? 'success' : 'danger'; ?>"
                 role="alert">
                 <?php echo $message; ?>
             </div>
-        <?php endif; ?>
+        <?php } ?>
 
         <h3><?php echo $userData['username']; ?></h3>
 
@@ -48,3 +49,6 @@ include 'layout.php';
         </form>
     </div>
 </div>
+
+<script src="../../../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../../../assets/js/script.js"></script>

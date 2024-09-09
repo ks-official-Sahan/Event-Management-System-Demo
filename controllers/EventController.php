@@ -83,4 +83,45 @@ class EventController
             self::sendJsonResponse('error', 'Invalid request method or user not authenticated.');
         }
     }
+
+    public static function listAll()
+    {
+        try {
+            $allEvents = Event::getAllEvents();
+            $response = ['status' => 'success', 'events' => $allEvents];
+
+            $projectPath = $_SERVER['DOCUMENT_ROOT'];
+            include "$projectPath/eventSys/view/event_list.php";
+        } catch (Exception $e) {
+            $response = ['status' => 'error', 'message' => 'Error fetching events: ' . $e->getMessage()];
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        }
+    }
+
+    public static function listByUser()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (isset($_SESSION['user'])) {
+            $userId = $_SESSION['user']["id"];
+            try {
+                $userEvents = Event::getEventsByUserId($userId);
+                $response = ['status' => 'success', 'events' => $userEvents];
+
+                $projectPath = $_SERVER['DOCUMENT_ROOT'];
+                include "$projectPath/eventSys/view/my-events.php";
+            } catch (Exception $e) {
+                $response = ['status' => 'error', 'message' => 'Error fetching your events: ' . $e->getMessage()];
+                header('Content-Type: application/json');
+                echo json_encode($response);
+            }
+        } else {
+            $response = ['status' => 'error', 'message' => 'You need to be logged in to view your events.'];
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        }
+
+    }
 }

@@ -1,16 +1,14 @@
 <?php
 class Admin
 {
-    public static function create($title, $firstName, $lastName, $email, $password, $mobileNo, $position, $username)
+    public static function create($firstName, $lastName, $email, $password, $mobileNo, $username)
     {
         $data = [
-            'title' => $title,
             'first_name' => $firstName,
             'last_name' => $lastName,
             'email' => $email,
             'password' => $password,
             'mobile_no' => $mobileNo,
-            'position' => $position,
             'username' => $username
         ];
         return Database::getInstance()->insert('admins', $data);

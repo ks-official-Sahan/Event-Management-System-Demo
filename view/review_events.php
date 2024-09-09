@@ -15,7 +15,7 @@ include 'layout.php';
         <?php endif; ?>
 
         <?php if (count($pendingEvents) > 0): ?>
-            <ul class="list-group">
+            <ul class="list-group gap-4 g-2 py-4">
                 <?php foreach ($pendingEvents as $event): ?>
                     <li class="list-group-item">
                         <h3><?php echo $event['title']; ?></h3>
@@ -29,7 +29,7 @@ include 'layout.php';
                         <p>Contact Phone: <?php echo $event['contact_phone']; ?></p>
                         <p>Special Requests: <?php echo $event['special_requests']; ?></p>
 
-                        <form method="post" action="/admin/review-events">
+                        <form method="post" action="/eventsys/admin/review-events">
                             <input type="hidden" name="event_id" value="<?php echo $event['id']; ?>">
                             <button type="submit" name="approve_event" class="btn btn-success">Approve</button>
                             <button type="submit" name="reject_event" class="btn btn-danger">Reject</button>
